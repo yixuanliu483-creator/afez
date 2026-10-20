@@ -1,6 +1,5 @@
 /**
  * API 封装层
- * 支持真实后端 + 本地 Mock（方便无后端时预览）
  */
 
 const Storage = {
@@ -22,18 +21,10 @@ const Storage = {
     sessionStorage.removeItem('token');
   },
   getUser() {
-    try {
-      return JSON.parse(localStorage.getItem('user') || 'null');
-    } catch {
-      return null;
-    }
+    try { return JSON.parse(localStorage.getItem('user') || 'null'); } catch { return null; }
   },
-  setUser(user) {
-    localStorage.setItem('user', JSON.stringify(user));
-  },
-  clearUser() {
-    localStorage.removeItem('user');
-  },
+  setUser(user) { localStorage.setItem('user', JSON.stringify(user)); },
+  clearUser() { localStorage.removeItem('user'); },
   isLoggedIn() {
     const token = this.getToken();
     if (!token) return false;
@@ -54,9 +45,7 @@ const MockDB = {
     localStorage.setItem('mock_users', JSON.stringify(this.users));
     localStorage.setItem('mock_next_uid', String(this.nextUid));
   },
-  validateQQEmail(qq) {
-    return /^\d{5,12}$/.test(qq);
-  },
+  validateQQEmail(qq) { return /^\d{5,12}$/.test(qq); },
   register(qq, nickname, password) {
     if (!this.validateQQEmail(qq)) return { ok: false, error: 'QQ号必须是5-12位纯数字' };
     const email = `${qq}@qq.com`;
@@ -68,8 +57,7 @@ const MockDB = {
     const user = { uid, email, nickname, password, avatar: null, createdAt: new Date().toISOString() };
     this.users.push(user);
     this.save();
-    const token = 'mock_' + uid + '_' + Date.now();
-    return { ok: true, token, user: { uid, email, nickname, avatar: null } };
+    return { ok: true, token: 'mock_' + uid + '_' + Date.now(), user: { uid, email, nickname, avatar: null } };
   },
   login(qq, password) {
     if (!this.validateQQEmail(qq)) return { ok: false, error: 'QQ号必须是5-12位纯数字' };
@@ -77,8 +65,7 @@ const MockDB = {
     const user = this.users.find(u => u.email === email);
     if (!user) return { ok: false, error: '账号不存在，请先注册' };
     if (user.password !== password) return { ok: false, error: '密码错误' };
-    const token = 'mock_' + user.uid + '_' + Date.now();
-    return { ok: true, token, user: { uid: user.uid, email: user.email, nickname: user.nickname, avatar: user.avatar } };
+    return { ok: true, token: 'mock_' + user.uid + '_' + Date.now(), user: { uid: user.uid, email: user.email, nickname: user.nickname, avatar: user.avatar } };
   },
   getProfile(token) {
     if (!token || !token.startsWith('mock_')) return null;
@@ -110,9 +97,7 @@ const API = {
     try {
       const data = await request('/api/auth/send-code', { method: 'POST', body: { email: `${qq}@qq.com`, purpose } });
       return { ok: true, message: data.message, dev_code: data.dev_code };
-    } catch (e) {
-      return { ok: false, error: e.message };
-    }
+    } catch (e) { return { ok: false, error: e.message }; }
   },
   async register(qq, nickname, password, code) {
     if (CONFIG.USE_MOCK) {
@@ -123,25 +108,53 @@ const API = {
     try {
       const data = await request('/api/auth/register', { method: 'POST', body: { email: `${qq}@qq.com`, nickname, password, code } });
       return { ok: true, token: data.token, user: data.user };
-    } catch (e) {
-      return { ok: false, error: e.message };
-    }
+    } catch (e) { return { ok: false, error: e.message }; }
   },
   async login(qq, password) {
     if (CONFIG.USE_MOCK) return MockDB.login(qq, password);
     try {
       const data = await request('/api/auth/login', { method: 'POST', body: { email: `${qq}@qq.com`, password } });
       return { ok: true, token: data.token, user: data.user };
-    } catch (e) {
-      return { ok: false, error: e.message };
-    }
+    } catch (e) { return { ok: false, error: e.message }; }
   },
   async getProfile() {
     if (CONFIG.USE_MOCK) return MockDB.getProfile(Storage.getToken());
     try { return await request('/api/user/me'); } catch { return null; }
   },
-  async logout() {
-    Storage.clearToken();
-    Storage.clearUser();
+  async logout() { Storage.clearToken(); Storage.clearUser(); },
+  async listBoards() {
+    if (CONFIG.USE_MOCK) return CONFIG.BOARDS.map(b => ({ ...b, post_count: 0, description: '' }));
+    try {
+      const data = await request('/api/boards');
+      return data.boards || [];
+    } catch (e) {
+      return CONFIG.BOARDS.map(b => ({ ...b, post_count: 0 }));
+    }
+  },
+  async listPosts(boardId, page = 1) {
+    if (CONFIG.USE_MOCK) return [];
+    try {
+      const q = boardId ? `?board=${encodeURIComponent(boardId)}&page=${page}` : `?page=${page}`;
+      const data = await request('/api/posts' + q);
+      return data.posts || [];
+    } catch (e) { return []; }
+  },
+  async getPost(id) {
+    if (CONFIG.USE_MOCK) return null;
+    try { return await request('/api/posts/' + id); } catch (e) { return null; }
+  },
+  async createPost(boardId, title, content) {
+    if (CONFIG.USE_MOCK) return { ok: true, id: 1 };
+    try {
+      const data = await request('/api/posts', { method: 'POST', body: { board_id: boardId, title, content } });
+      return { ok: true, id: data.id };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async createComment(postId, content) {
+    if (CONFIG.USE_MOCK) return { ok: true };
+    try {
+      await request('/api/posts/' + postId + '/comments', { method: 'POST', body: { content } });
+      return { ok: true };
+    } catch (e) { return { ok: false, error: e.message }; }
   }
 };
