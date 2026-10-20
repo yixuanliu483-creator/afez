@@ -1,7 +1,7 @@
-/* 基础与原有样式保留，此处为完整 styles 含贴吧 */
+/* 基础 */
 * { margin: 0; padding: 0; box-sizing: border-box; }
 :root {
-  --primary: #7c3aed; --primary-light: #a78bfa; --pink: #ec4899; --blue: #3b82f6;
+  --primary: #7c3aed; --primary-light: #a78bfa; --pink: #ec4899; --blue: #12B7F5;
   --bg-gradient: linear-gradient(135deg, #dbeafe 0%, #e9d5ff 40%, #fce7f3 70%, #fbcfe8 100%);
   --card-bg: rgba(255,255,255,0.85); --text: #1e1b4b; --text-secondary: #64748b;
   --border: rgba(124,58,237,0.15); --shadow: 0 8px 32px rgba(124,58,237,0.12);
@@ -75,7 +75,6 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .page-header h2 { font-size: 1.25rem; font-weight: 700; flex: 1; }
 .chat-container { background: white; border: 1px solid var(--border); border-radius: 12px; overflow: hidden; display: flex; flex-direction: column; height: calc(100vh - var(--nav-h) - 100px); min-height: 400px; }
 .chat-container.single { height: calc(100vh - var(--nav-h) - 80px); }
-.chat-container.single .chat-rooms { display: none; }
 .chat-messages { flex: 1; overflow-y: auto; padding: 1rem; display: flex; flex-direction: column; gap: 0.6rem; }
 .msg { max-width: 80%; padding: 0.6rem 0.9rem; border-radius: 12px; font-size: 0.9rem; line-height: 1.4; }
 .msg.system { align-self: center; background: #f1f5f9; color: var(--text-secondary); font-size: 0.8rem; }
@@ -93,8 +92,6 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .setting-item:last-child { border-bottom: none; }
 .setting-item input { width: 140px; padding: 0.4rem 0.6rem; border: 1.5px solid #e2e8f0; border-radius: 8px; font-size: 0.9rem; outline: none; }
 .hidden { display: none !important; }
-
-/* 贴吧风格 */
 .boards-list-tieba { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
 .board-row { display: flex; align-items: center; gap: 0.85rem; padding: 0.95rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; }
 .board-row:last-child { border-bottom: none; }
@@ -104,27 +101,38 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .board-row .board-name { font-weight: 600; font-size: 0.95rem; }
 .board-row .board-desc { font-size: 0.78rem; color: var(--text-secondary); margin-top: 2px; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
 .board-row .board-meta { font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; }
-.post-list-tieba { background: white; border-radius: 12px; border: 1px solid var(--border); overflow: hidden; }
-.post-row { display: flex; gap: 0.75rem; padding: 0.9rem 1rem; border-bottom: 1px solid var(--border); cursor: pointer; }
-.post-row:last-child { border-bottom: none; }
-.post-row:hover { background: #faf5ff; }
-.post-row .post-main { flex: 1; min-width: 0; }
-.post-row .post-title { font-weight: 600; font-size: 0.95rem; margin-bottom: 0.35rem; }
-.post-row .post-title .pin { display: inline-block; background: #fee2e2; color: #dc2626; font-size: 0.7rem; padding: 1px 5px; border-radius: 4px; margin-right: 4px; }
-.post-row .post-sub { font-size: 0.75rem; color: var(--text-secondary); display: flex; flex-wrap: wrap; gap: 0.5rem; }
-.post-row .post-stats { text-align: right; font-size: 0.75rem; color: var(--text-secondary); white-space: nowrap; min-width: 52px; }
-.post-row .post-stats .num { display: block; font-weight: 600; color: var(--text); font-size: 0.9rem; }
 .btn-back { border: none; background: transparent; color: var(--primary); font-size: 0.9rem; cursor: pointer; padding: 0.3rem 0.5rem; }
-.post-detail { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 1.1rem; margin-bottom: 1rem; }
-.post-detail .pd-title { font-size: 1.15rem; font-weight: 700; margin-bottom: 0.6rem; }
-.post-detail .pd-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 1rem; }
-.post-detail .pd-content { line-height: 1.7; white-space: pre-wrap; word-break: break-word; margin-bottom: 1.2rem; }
-.post-detail .comment-item { border-top: 1px solid var(--border); padding: 0.85rem 0; }
-.post-detail .comment-meta { font-size: 0.8rem; color: var(--text-secondary); margin-bottom: 0.35rem; }
-.post-detail .comment-body { font-size: 0.92rem; line-height: 1.55; white-space: pre-wrap; }
-.reply-box { background: white; border: 1px solid var(--border); border-radius: 12px; padding: 0.9rem; margin-bottom: 2rem; }
+.reply-box { background: white; border-radius: 12px; padding: 0.9rem; margin-bottom: 2rem; }
 .reply-box textarea { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.7rem; font-size: 0.95rem; font-family: inherit; resize: vertical; outline: none; margin-bottom: 0.6rem; }
-.compose-box h3 { margin-bottom: 1rem; }
+.compose-box h3 { margin-bottom: 1rem; text-align: center; }
 .compose-box textarea { width: 100%; border: 1.5px solid #e2e8f0; border-radius: 10px; padding: 0.7rem; font-size: 0.95rem; font-family: inherit; resize: vertical; outline: none; }
 .compose-actions { display: flex; gap: 0.6rem; justify-content: flex-end; margin-top: 0.5rem; }
 .empty-list { text-align: center; padding: 2.5rem 1rem; color: var(--text-secondary); font-size: 0.9rem; }
+
+/* QQ频道式信息流 */
+.post-list-tieba { background: transparent; border: none; display: flex; flex-direction: column; gap: 10px; }
+.channel-card { background: #fff; border-radius: 12px; padding: 14px 14px 10px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); cursor: pointer; border: 1px solid #f0f0f0; }
+.channel-card:active { background: #fafafa; }
+.channel-card-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 10px; }
+.channel-avatar { width: 40px; height: 40px; border-radius: 50%; object-fit: cover; flex-shrink: 0; }
+.channel-avatar.sm { width: 32px; height: 32px; }
+.channel-user { flex: 1; min-width: 0; }
+.channel-nick { font-size: 14px; font-weight: 600; color: #1a1a1a; }
+.channel-time { font-size: 12px; color: #999; margin-top: 2px; }
+.channel-pin { font-size: 11px; color: #ff6b35; background: #fff3ee; padding: 2px 6px; border-radius: 4px; font-weight: 500; }
+.channel-card-bd { margin-bottom: 10px; }
+.channel-title { font-size: 16px; font-weight: 600; color: #1a1a1a; line-height: 1.4; margin-bottom: 6px; }
+.channel-text { font-size: 14px; color: #666; line-height: 1.55; display: -webkit-box; -webkit-line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
+.channel-card-ft { display: flex; gap: 20px; padding-top: 8px; border-top: 1px solid #f5f5f5; font-size: 13px; color: #999; }
+.channel-detail-hd { display: flex; align-items: center; gap: 10px; margin-bottom: 12px; }
+.channel-detail-title { font-size: 18px; font-weight: 700; line-height: 1.4; margin-bottom: 10px; color: #1a1a1a; }
+.channel-detail-body { font-size: 15px; line-height: 1.7; color: #333; white-space: pre-wrap; word-break: break-word; margin-bottom: 12px; }
+.channel-detail-meta { font-size: 12px; color: #999; margin-bottom: 16px; padding-bottom: 12px; border-bottom: 1px solid #f0f0f0; }
+.channel-comments-title { font-size: 15px; font-weight: 600; margin-bottom: 12px; color: #1a1a1a; }
+.channel-comment { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
+.channel-comment-main { flex: 1; min-width: 0; }
+.channel-comment-text { font-size: 14px; color: #333; line-height: 1.5; margin-top: 4px; white-space: pre-wrap; }
+.fab-post { position: fixed; right: 20px; bottom: 28px; width: 56px; height: 56px; border-radius: 50%; border: none; background: linear-gradient(135deg, #12B7F5, #0099ff); color: white; font-size: 28px; line-height: 1; box-shadow: 0 4px 16px rgba(18,183,245,0.45); cursor: pointer; z-index: 90; display: flex; align-items: center; justify-content: center; padding: 0; }
+.fab-post:active { transform: scale(0.95); }
+#page-board, #page-post-detail { background: #f5f6f8; margin: -1rem; padding: 1rem; min-height: calc(100vh - var(--nav-h)); }
+#page-post-detail .post-detail { background: #fff; border: none; border-radius: 12px; box-shadow: 0 1px 4px rgba(0,0,0,0.06); padding: 1.1rem; margin-bottom: 1rem; }
