@@ -83,36 +83,60 @@
       </nav>
     </aside>
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
+
     <main id="content" class="content">
-      <section id="page-tieba" class="content-page active">
-        <div class="page-header"><h2>二中贴吧</h2></div>
-        <div class="boards-list-tieba" id="boards-list"></div>
-      </section>
-      <section id="page-board" class="content-page">
-        <div class="page-header">
-          <button class="btn-back" id="back-to-boards">← 返回</button>
-          <h2 id="board-title">板块</h2>
-          <button class="btn-secondary" id="new-post-btn">发帖</button>
+      <section id="page-tieba" class="content-page active wall-page">
+        <div class="wall-tabs" id="wall-tabs">
+          <button class="wall-tab active" data-tab="all">全部</button>
+          <button class="wall-tab" data-tab="hot">热门</button>
+          <button class="wall-tab" data-tab="essence">精华</button>
+          <button class="wall-tab" data-board="xunwu">寻物启事</button>
+          <button class="wall-tab" data-board="shiwu">失物招领</button>
+          <button class="wall-tab" data-board="chuwu">出物</button>
         </div>
-        <div class="post-list-tieba" id="posts-list"></div>
+        <div class="wall-pin" id="wall-pin">
+          <strong>置顶 |</strong> 各位同学，安福二中论坛用于善意投稿、交友、求助、失物招领等，请文明发言。
+        </div>
+        <div class="wall-feed" id="wall-feed"></div>
+        <div class="wall-bottom-bar">
+          <button type="button" class="wall-assistant" id="wall-assistant">频道助手</button>
+          <div class="wall-compose-input" id="wall-compose-open">
+            <span class="wall-placeholder">期待你的分享</span>
+          </div>
+          <button type="button" class="wall-plus" id="wall-plus" aria-label="发帖">+</button>
+        </div>
       </section>
+
       <section id="page-post-detail" class="content-page">
         <div class="page-header">
-          <button class="btn-back" id="back-to-board">← 返回</button>
-          <h2>帖子详情</h2>
+          <button class="btn-back" id="back-to-wall">← 返回</button>
+          <h2>详情</h2>
         </div>
-        <div id="post-detail" class="post-detail"></div>
+        <div id="post-detail" class="post-detail wall-detail"></div>
         <div class="reply-box">
           <textarea id="reply-content" placeholder="写下你的回复..." rows="3"></textarea>
           <button class="btn-primary" id="reply-btn">发表回复</button>
         </div>
       </section>
+
       <div id="compose-modal" class="modal hidden">
         <div class="modal-overlay"></div>
         <div class="modal-box compose-box">
-          <h3>发布新帖</h3>
-          <div class="form-group"><label>标题</label><input type="text" id="compose-title" placeholder="标题(2-80字)" maxlength="80" /></div>
-          <div class="form-group"><label>内容</label><textarea id="compose-content" placeholder="说点什么..." rows="6"></textarea></div>
+          <h3>发布分享</h3>
+          <div class="form-group">
+            <label>分类</label>
+            <select id="compose-board">
+              <option value="daily">全部动态</option>
+              <option value="xunwu">寻物启事</option>
+              <option value="shiwu">失物招领</option>
+              <option value="chuwu">出物</option>
+              <option value="help">求助</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>内容</label>
+            <textarea id="compose-content" placeholder="说点什么..." rows="6"></textarea>
+          </div>
           <div class="compose-actions">
             <button type="button" class="btn-secondary" id="compose-cancel">取消</button>
             <button type="button" class="btn-primary" id="compose-submit">发布</button>
@@ -120,6 +144,7 @@
           <p class="error-msg" id="compose-error"></p>
         </div>
       </div>
+
       <section id="page-chat" class="content-page">
         <div class="page-header"><h2>实时聊天</h2></div>
         <div class="chat-container single">
@@ -147,7 +172,6 @@
         </div>
       </section>
     </main>
-    <button type="button" id="fab-post" class="fab-post" style="display:none" aria-label="发帖">+</button>
   </div>
   <script src="config.js"></script>
   <script src="api.js"></script>
