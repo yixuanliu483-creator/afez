@@ -5,20 +5,13 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <title>安福二中论坛</title>
   <link rel="stylesheet" href="styles.css" />
-  <link rel="preconnect" href="https://fonts.googleapis.com" />
-  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
 </head>
 <body>
-  <div id="welcome-page" class="page active">
+  <div id="welcome-page" class="page">
     <div class="gradient-bg"></div>
     <div class="welcome-content">
-      <div class="school-logo">
-        <div class="logo-placeholder">
-          <span class="logo-text">安福二中</span>
-          <span class="logo-sub">ANFU NO.2 MIDDLE SCHOOL</span>
-        </div>
-      </div>
+      <div class="school-logo"><div class="logo-placeholder"><span class="logo-text">安福二中</span><span class="logo-sub">ANFU NO.2 MIDDLE SCHOOL</span></div></div>
       <h1 class="forum-title">安福二中论坛</h1>
       <p class="forum-subtitle">校园大型交流社区</p>
       <button id="enter-btn" class="btn-primary">立即进入</button>
@@ -32,55 +25,30 @@
         <button class="tab active" data-tab="login">登录</button>
         <button class="tab" data-tab="register">注册</button>
       </div>
-
       <form id="login-form" class="auth-form">
-        <div class="form-group">
-          <label>QQ邮箱</label>
-          <div class="email-input-wrap">
-            <input type="text" id="login-qq" placeholder="请输入QQ号" inputmode="numeric" pattern="[0-9]*" required />
-            <span class="email-suffix">@qq.com</span>
-          </div>
+        <div class="form-group"><label>QQ邮箱</label>
+          <div class="email-input-wrap"><input type="text" id="login-qq" placeholder="请输入QQ号" inputmode="numeric" required /><span class="email-suffix">@qq.com</span></div>
           <p class="hint">仅支持纯数字QQ号@qq.com</p>
         </div>
-        <div class="form-group">
-          <label>密码</label>
-          <input type="password" id="login-password" placeholder="请输入密码" required minlength="6" />
-        </div>
-        <div class="form-group remember">
-          <label><input type="checkbox" id="remember-me" checked /> 记住我（90天）</label>
-        </div>
+        <div class="form-group"><label>密码</label><input type="password" id="login-password" placeholder="请输入密码" required minlength="6" /></div>
+        <div class="form-group remember"><label><input type="checkbox" id="remember-me" checked /> 记住我(90天)</label></div>
         <button type="submit" class="btn-primary full">登录</button>
         <p class="error-msg" id="login-error"></p>
       </form>
-
       <form id="register-form" class="auth-form hidden">
-        <div class="form-group">
-          <label>QQ邮箱</label>
-          <div class="email-input-wrap">
-            <input type="text" id="reg-qq" placeholder="请输入QQ号" inputmode="numeric" pattern="[0-9]*" required />
-            <span class="email-suffix">@qq.com</span>
-          </div>
-          <p class="hint">仅支持纯数字QQ号@qq.com，需验证码验证</p>
+        <div class="form-group"><label>QQ邮箱</label>
+          <div class="email-input-wrap"><input type="text" id="reg-qq" placeholder="请输入QQ号" inputmode="numeric" required /><span class="email-suffix">@qq.com</span></div>
+          <p class="hint">仅支持纯数字QQ号@qq.com</p>
         </div>
-        <div class="form-group">
-          <label>邮箱验证码</label>
+        <div class="form-group"><label>邮箱验证码</label>
           <div class="email-input-wrap" style="gap:0">
             <input type="text" id="reg-code" placeholder="6位验证码" inputmode="numeric" maxlength="6" required style="flex:1;border:none;padding:0.7rem 0.9rem;outline:none" />
             <button type="button" id="send-code-btn" class="btn-secondary small" style="margin:4px;white-space:nowrap;border-radius:8px">获取验证码</button>
           </div>
         </div>
-        <div class="form-group">
-          <label>昵称</label>
-          <input type="text" id="reg-nickname" placeholder="2-16个字符" required minlength="2" maxlength="16" />
-        </div>
-        <div class="form-group">
-          <label>密码</label>
-          <input type="password" id="reg-password" placeholder="至少6位" required minlength="6" />
-        </div>
-        <div class="form-group">
-          <label>确认密码</label>
-          <input type="password" id="reg-password2" placeholder="再次输入密码" required minlength="6" />
-        </div>
+        <div class="form-group"><label>昵称</label><input type="text" id="reg-nickname" placeholder="2-16个字符" required minlength="2" maxlength="16" /></div>
+        <div class="form-group"><label>密码</label><input type="password" id="reg-password" placeholder="至少6位" required minlength="6" /></div>
+        <div class="form-group"><label>确认密码</label><input type="password" id="reg-password2" placeholder="再次输入密码" required minlength="6" /></div>
         <button type="submit" class="btn-primary full">注册并登录</button>
         <p class="error-msg" id="reg-error"></p>
       </form>
@@ -90,11 +58,11 @@
   <div id="main-page" class="page">
     <header class="navbar">
       <button id="hamburger-btn" class="icon-btn" aria-label="菜单"><span></span><span></span><span></span></button>
-      <div class="nav-center"><h1 class="nav-title">安福二中论坛</h1></div>
+      <div class="nav-center"><h1 class="nav-title" id="nav-title">安福二中论坛</h1></div>
       <div class="nav-right">
         <div class="search-box"><input type="search" id="global-search" placeholder="搜索..." /></div>
         <div class="user-area">
-          <img id="user-avatar" class="avatar" src="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Ccircle cx='50' cy='50' r='50' fill='%23a78bfa'/%3E%3Ctext x='50' y='58' text-anchor='middle' fill='white' font-size='40' font-family='sans-serif'%3EU%3C/text%3E%3C/svg%3E" alt="头像" />
+          <img id="user-avatar" class="avatar" src="" alt="头像" />
           <div id="user-dropdown" class="dropdown hidden">
             <div class="dropdown-item" data-action="profile">个人信息</div>
             <div class="dropdown-item" data-action="settings">设置</div>
@@ -107,7 +75,7 @@
       <div class="sidebar-header"><span>菜单</span><button id="sidebar-close" class="icon-btn close">×</button></div>
       <nav class="sidebar-nav">
         <a href="#" class="sidebar-item active" data-page="tieba"><span class="icon">📌</span> 二中贴吧</a>
-        <a href="#" class="sidebar-item" data-page="chat"><span class="icon">💬</span> 实时聊天论坛</a>
+        <a href="#" class="sidebar-item" data-page="chat"><span class="icon">💬</span> 实时聊天</a>
         <a href="#" class="sidebar-item" data-page="market"><span class="icon">🛒</span> 跳蚤市场</a>
         <div class="sidebar-divider"></div>
         <a href="#" class="sidebar-item" data-page="profile"><span class="icon">👤</span> 个人信息</a>
@@ -117,21 +85,54 @@
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
     <main id="content" class="content">
       <section id="page-tieba" class="content-page active">
-        <div class="page-header"><h2>二中贴吧</h2><button class="btn-secondary" id="new-post-btn">发帖</button></div>
-        <div class="boards-grid" id="boards-list"></div>
-        <div class="posts-list" id="posts-list"></div>
+        <div class="page-header"><h2>二中贴吧</h2></div>
+        <div class="boards-list-tieba" id="boards-list"></div>
       </section>
+      <section id="page-board" class="content-page">
+        <div class="page-header">
+          <button class="btn-back" id="back-to-boards">← 返回</button>
+          <h2 id="board-title">板块</h2>
+          <button class="btn-secondary" id="new-post-btn">发帖</button>
+        </div>
+        <div class="post-list-tieba" id="posts-list"></div>
+      </section>
+      <section id="page-post-detail" class="content-page">
+        <div class="page-header">
+          <button class="btn-back" id="back-to-board">← 返回</button>
+          <h2>帖子详情</h2>
+        </div>
+        <div id="post-detail" class="post-detail"></div>
+        <div class="reply-box">
+          <textarea id="reply-content" placeholder="写下你的回复..." rows="3"></textarea>
+          <button class="btn-primary" id="reply-btn">发表回复</button>
+        </div>
+      </section>
+      <div id="compose-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-box compose-box">
+          <h3>发布新帖</h3>
+          <div class="form-group"><label>标题</label><input type="text" id="compose-title" placeholder="标题(2-80字)" maxlength="80" /></div>
+          <div class="form-group"><label>内容</label><textarea id="compose-content" placeholder="说点什么..." rows="6"></textarea></div>
+          <div class="compose-actions">
+            <button type="button" class="btn-secondary" id="compose-cancel">取消</button>
+            <button type="button" class="btn-primary" id="compose-submit">发布</button>
+          </div>
+          <p class="error-msg" id="compose-error"></p>
+        </div>
+      </div>
       <section id="page-chat" class="content-page">
-        <div class="page-header"><h2>实时聊天论坛</h2></div>
-        <div class="chat-container">
-          <div class="chat-rooms"><div class="room active">综合聊天</div><div class="room">学习交流</div><div class="room">生活分享</div></div>
-          <div class="chat-messages" id="chat-messages"><div class="msg system">欢迎来到安福二中实时聊天！请文明发言。</div></div>
-          <div class="chat-input-area"><input type="text" id="chat-input" placeholder="输入消息..." /><button id="chat-send" class="btn-primary">发送</button></div>
+        <div class="page-header"><h2>实时聊天</h2></div>
+        <div class="chat-container single">
+          <div class="chat-messages" id="chat-messages"><div class="msg system">欢迎来到安福二中聊天室，请文明发言。</div></div>
+          <div class="chat-input-area">
+            <input type="text" id="chat-input" placeholder="输入消息..." />
+            <button id="chat-send" class="btn-primary">发送</button>
+          </div>
         </div>
       </section>
       <section id="page-market" class="content-page">
         <div class="page-header"><h2>跳蚤市场</h2><button class="btn-secondary">发布闲置</button></div>
-        <div class="market-grid" id="market-list"><div class="empty-tip">暂无闲置物品，快来发布吧～</div></div>
+        <div class="market-grid" id="market-list"><div class="empty-tip">暂无闲置物品，快来发布吧</div></div>
       </section>
       <section id="page-profile" class="content-page">
         <div class="page-header"><h2>个人信息</h2></div>
