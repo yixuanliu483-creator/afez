@@ -90,7 +90,7 @@ const API = {
   async likePost(postId) {
     try {
       const data = await request('/api/posts/' + postId + '/like', { method: 'POST' });
-      return { ok: true, like_count: data.like_count };
+      return { ok: true, like_count: data.like_count, liked: data.liked };
     } catch (e) { return { ok: false, error: e.message }; }
   },
   async createComment(postId, content) {
@@ -124,5 +124,17 @@ const API = {
       await request('/api/market/' + id + '/sold', { method: 'POST' });
       return { ok: true };
     } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async deletePost(id) {
+    try {
+      await request('/api/posts/' + id, { method: 'DELETE' });
+      return { ok: true };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async adminListPosts(page = 1) {
+    try {
+      const data = await request('/api/admin/posts?page=' + page);
+      return data.posts || [];
+    } catch (e) { return []; }
   }
 };
