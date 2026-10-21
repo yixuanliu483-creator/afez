@@ -1,4 +1,4 @@
-/** 安福二中论坛 - 贴吧+匿名墙+热门+跳蚤市场 */
+/** 安福二中论坛 - 贴吧+匿名+市场+管理 */
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const welcomePage = $('#welcome-page');
@@ -20,7 +20,7 @@ let currentTab = 'all';
 let composeMode = 'normal';
 
 function init() {
-  if (Storage.isLoggedIn()) { forceMainPage(); loadUserInfo(); loadWallFeed(); }
+  if (Storage.isLoggedIn()) { forceMainPage(); loadUserInfo(); refreshRole(); loadWallFeed(); }
   else forceWelcomePage();
   bindEvents();
 }
@@ -38,9 +38,29 @@ function forceMainPage() {
 function openAuthModal() { authModal.classList.remove('hidden'); switchAuthTab('login'); }
 function closeAuthModal() { authModal.classList.add('hidden'); }
 
+async function refreshRole() {
+  try {
+    const p = await API.getProfile();
+    if (p && p.role) {
+      const u = Storage.getUser() || {};
+      u.role = p.role;
+      Storage.setUser(u);
+      updateAdminMenu();
+    }
+  } catch (_) {}
+}
+function isStaffUser() {
+  const u = Storage.getUser();
+  return u && (u.role === 'admin' || u.role === 'owner');
+}
+function updateAdminMenu() {
+  const el = $('#sidebar-admin');
+  if (el) el.style.display = isStaffUser() ? 'flex' : 'none';
+}
+
 function bindEvents() {
   if (enterBtn) enterBtn.addEventListener('click', () => {
-    if (Storage.isLoggedIn()) { forceMainPage(); loadUserInfo(); loadWallFeed(); }
+    if (Storage.isLoggedIn()) { forceMainPage(); loadUserInfo(); refreshRole(); loadWallFeed(); }
     else openAuthModal();
   });
   const overlay = authModal && authModal.querySelector('.modal-overlay');
@@ -57,7 +77,7 @@ function bindEvents() {
     const res = await API.login(qq, password);
     if (!res.ok) { if (errEl) errEl.textContent = res.error; return; }
     Storage.setToken(res.token, remember); Storage.setUser(res.user);
-    forceMainPage(); loadUserInfo(); loadWallFeed();
+    forceMainPage(); loadUserInfo(); refreshRole(); loadWallFeed();
   });
   const sendCodeBtn = $('#send-code-btn');
   if (sendCodeBtn) sendCodeBtn.addEventListener('click', async () => {
@@ -110,6 +130,7 @@ function bindEvents() {
       if (page === 'tieba') loadWallFeed();
       if (page === 'anonymous') loadAnonFeed();
       if (page === 'market') loadMarket();
+      if (page === 'admin') loadAdminPosts();
     });
   });
   if (userAvatar) userAvatar.addEventListener('click', (e) => { e.stopPropagation(); if (userDropdown) userDropdown.classList.toggle('hidden'); });
@@ -241,8 +262,11 @@ function renderFeedCards(posts, container) {
     btn.addEventListener('click', async (e) => {
       e.stopPropagation();
       const res = await API.likePost(btn.dataset.id);
-      if (res.ok) btn.textContent = '👍 ' + (res.like_count != null ? res.like_count : '');
-      else alert(res.error || '点赞失败');
+      if (res.ok) {
+        btn.textContent = '👍 ' + (res.like_count != null ? res.like_count : '');
+        if (res.liked) btn.classList.add('liked');
+        else btn.classList.remove('liked');
+      } else alert(res.error || '操作失败');
     });
   });
 }
@@ -435,11 +459,47 @@ async function submitMarket() {
   switchContentPage('market');
   loadMarket();
 }
+async function loadAdminPosts() {
+  const list = $('#admin-post-list');
+  if (!list) return;
+  if (!isStaffUser()) {
+    list.innerHTML = '<div class="empty-tip">无管理权限</div>';
+    return;
+  }
+  list.innerHTML = '<div class="empty-tip">加载中...</div>';
+  const posts = await API.adminListPosts(1);
+  if (!posts.length) {
+    list.innerHTML = '<div class="empty-tip">暂无帖子</div>';
+    return;
+  }
+  list.innerHTML = posts.map((p) => {
+    const body = p.content || p.title || '';
+    const name = (p.is_anonymous || p.board_id === 'anonymous') ? '匿名用户' : (p.nickname || '');
+    return '<div class="admin-card" data-id="' + p.id + '">' +
+      '<div class="admin-card-hd">' +
+      '<div><strong>#' + p.id + '</strong> ' + escapeHtml(p.board_name || p.board_id || '') +
+      '<div class="admin-card-meta">' + escapeHtml(name) + ' · ' + formatTime(p.created_at) +
+      ' · 赞' + (p.like_count || 0) + ' · 评' + (p.reply_count || 0) + '</div></div>' +
+      '<button type="button" class="btn-danger admin-del" data-id="' + p.id + '">删除</button>' +
+      '</div>' +
+      '<div class="admin-card-body">' + escapeHtml(body) + '</div></div>';
+  }).join('');
+  list.querySelectorAll('.admin-del').forEach((btn) => {
+    btn.addEventListener('click', async () => {
+      if (!confirm('确定删除帖子 #' + btn.dataset.id + '？不可恢复')) return;
+      const res = await API.deletePost(btn.dataset.id);
+      if (!res.ok) { alert(res.error || '删除失败'); return; }
+      loadAdminPosts();
+      loadWallFeed();
+    });
+  });
+}
 function loadUserInfo() {
   const user = Storage.getUser();
   if (!user || !userAvatar) return;
   userAvatar.src = avatarDataUrl(user.nickname);
   userAvatar.alt = user.nickname || '';
+  updateAdminMenu();
   const nickInput = $('#setting-nickname');
   if (nickInput) nickInput.value = user.nickname || '';
 }
@@ -450,10 +510,12 @@ function renderProfile() {
   if (!card) return;
   card.innerHTML = '<img class="big-avatar" src="' + avatarDataUrl(user.nickname) + '" alt="" /><div class="nickname">' +
     escapeHtml(user.nickname) + '</div><div class="uid">UID: ' + user.uid +
-    '</div><div class="uid" style="margin-top:0.5rem">' + escapeHtml(user.email) + '</div>';
+    '</div><div class="uid" style="margin-top:0.5rem">' + escapeHtml(user.email || '') +
+    (user.role === 'owner' || user.role === 'admin' ? ' · ' + (user.role === 'owner' ? '站长' : '管理员') : '') + '</div>';
 }
 function doLogout() {
   API.logout(); forceWelcomePage();
+  updateAdminMenu();
   if (loginForm) loginForm.reset();
   if (registerForm) registerForm.reset();
 }
