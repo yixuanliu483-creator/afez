@@ -167,8 +167,36 @@
         </div>
       </section>
       <section id="page-market" class="content-page">
-        <div class="page-header"><h2>跳蚤市场</h2><button class="btn-secondary">发布闲置</button></div>
-        <div class="market-grid" id="market-list"><div class="empty-tip">暂无闲置物品，快来发布吧</div></div>
+        <div class="market-top">
+          <div class="market-search-bar">
+            <input type="search" id="market-search" placeholder="搜索闲置..." />
+            <button type="button" class="btn-primary small" id="market-search-btn">搜索</button>
+          </div>
+          <button type="button" class="btn-primary" id="market-publish-btn">发布闲置</button>
+        </div>
+        <div class="market-grid" id="market-list"><div class="empty-tip">加载中...</div></div>
+      </section>
+      <div id="market-modal" class="modal hidden">
+        <div class="modal-overlay"></div>
+        <div class="modal-box compose-box">
+          <h3>发布闲置</h3>
+          <div class="form-group"><label>标题</label><input type="text" id="market-title" placeholder="例如：九成新计算器" maxlength="60" /></div>
+          <div class="form-group"><label>价格（元）</label><input type="number" id="market-price" placeholder="0.00" min="0" step="0.01" /></div>
+          <div class="form-group"><label>描述</label><textarea id="market-desc" placeholder="成色、使用情况、交易方式等..." rows="4"></textarea></div>
+          <p class="hint" style="margin-bottom:0.8rem">图片上传功能稍后开放</p>
+          <div class="compose-actions">
+            <button type="button" class="btn-secondary" id="market-cancel">取消</button>
+            <button type="button" class="btn-primary" id="market-submit">发布</button>
+          </div>
+          <p class="error-msg" id="market-error"></p>
+        </div>
+      </div>
+      <section id="page-market-detail" class="content-page">
+        <div class="page-header">
+          <button class="btn-back" id="back-to-market">← 返回市场</button>
+          <h2>商品详情</h2>
+        </div>
+        <div id="market-detail" class="market-detail-box"></div>
       </section>
       <section id="page-profile" class="content-page">
         <div class="page-header"><h2>个人信息</h2></div>
