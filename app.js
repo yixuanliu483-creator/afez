@@ -1,4 +1,4 @@
-/** 安福二中论坛 - 贴吧+匿名墙+热门点赞 */
+/** 安福二中论坛 - 贴吧+匿名墙+热门+跳蚤市场 */
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const welcomePage = $('#welcome-page');
@@ -109,6 +109,7 @@ function bindEvents() {
       closeSidebar();
       if (page === 'tieba') loadWallFeed();
       if (page === 'anonymous') loadAnonFeed();
+      if (page === 'market') loadMarket();
     });
   });
   if (userAvatar) userAvatar.addEventListener('click', (e) => { e.stopPropagation(); if (userDropdown) userDropdown.classList.toggle('hidden'); });
@@ -137,8 +138,8 @@ function bindEvents() {
   if (backWall) backWall.addEventListener('click', () => {
     const last = document.querySelector('.sidebar-item.active');
     const page = (last && last.dataset.page) || 'tieba';
-    switchContentPage(page === 'anonymous' ? 'anonymous' : 'tieba');
-    if (page === 'anonymous') loadAnonFeed(); else loadWallFeed();
+    if (page === 'anonymous') { switchContentPage('anonymous'); loadAnonFeed(); }
+    else { switchContentPage('tieba'); loadWallFeed(); }
   });
   const openComposeNormal = () => openCompose('normal');
   const openComposeAnon = () => openCompose('anonymous');
@@ -156,6 +157,31 @@ function bindEvents() {
   }
   if ($('#compose-submit')) $('#compose-submit').addEventListener('click', submitPost);
   if ($('#reply-btn')) $('#reply-btn').addEventListener('click', submitReply);
+  const marketPub = $('#market-publish-btn');
+  if (marketPub) marketPub.addEventListener('click', openMarketModal);
+  const marketCancel = $('#market-cancel');
+  if (marketCancel) marketCancel.addEventListener('click', closeMarketModal);
+  const marketModal = $('#market-modal');
+  if (marketModal) {
+    const mo = marketModal.querySelector('.modal-overlay');
+    if (mo) mo.addEventListener('click', closeMarketModal);
+  }
+  const marketSubmit = $('#market-submit');
+  if (marketSubmit) marketSubmit.addEventListener('click', submitMarket);
+  const marketSearchBtn = $('#market-search-btn');
+  if (marketSearchBtn) marketSearchBtn.addEventListener('click', () => {
+    const q = ($('#market-search') && $('#market-search').value.trim()) || '';
+    loadMarket(q);
+  });
+  const marketSearch = $('#market-search');
+  if (marketSearch) marketSearch.addEventListener('keydown', (e) => {
+    if (e.key === 'Enter') loadMarket(marketSearch.value.trim());
+  });
+  const backMarket = $('#back-to-market');
+  if (backMarket) backMarket.addEventListener('click', () => {
+    switchContentPage('market');
+    loadMarket();
+  });
 }
 function switchAuthTab(tab) {
   $$('.modal-tabs .tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
@@ -321,6 +347,93 @@ async function submitReply() {
   const res = await API.createComment(currentPostId, content);
   if (!res.ok) { alert(res.error || '回复失败'); return; }
   openPost(currentPostId);
+}
+async function loadMarket(q) {
+  const list = $('#market-list');
+  if (!list) return;
+  list.innerHTML = '<div class="empty-tip">加载中...</div>';
+  const items = await API.listMarket(q || '');
+  if (!items.length) {
+    list.innerHTML = '<div class="empty-tip">暂无闲置，点右上角「发布闲置」上架吧</div>';
+    return;
+  }
+  list.innerHTML = items.map((it) => {
+    const price = Number(it.price);
+    const priceStr = isNaN(price) ? '—' : (price % 1 === 0 ? String(price) : price.toFixed(2));
+    return '<article class="market-card" data-id="' + it.id + '">' +
+      '<div class="market-card-img">📦</div>' +
+      '<div class="market-card-body">' +
+      '<div class="market-card-title">' + escapeHtml(it.title || '') + '</div>' +
+      '<div class="market-card-price"><small>¥</small>' + priceStr + '</div>' +
+      '<div class="market-card-seller">' + escapeHtml(it.nickname || '卖家') + '</div>' +
+      '</div></article>';
+  }).join('');
+  list.querySelectorAll('.market-card').forEach((card) => {
+    card.addEventListener('click', () => openMarketDetail(card.dataset.id));
+  });
+}
+async function openMarketDetail(id) {
+  switchContentPage('market-detail');
+  const box = $('#market-detail');
+  if (!box) return;
+  box.innerHTML = '<div class="empty-tip">加载中...</div>';
+  const data = await API.getMarketItem(id);
+  if (!data || !data.item) {
+    box.innerHTML = '<div class="empty-tip">商品不存在或已下架</div>';
+    return;
+  }
+  const it = data.item;
+  const price = Number(it.price);
+  const priceStr = isNaN(price) ? '—' : (price % 1 === 0 ? String(price) : price.toFixed(2));
+  const user = Storage.getUser();
+  const isOwner = user && user.uid === it.uid;
+  box.innerHTML =
+    '<div class="market-detail-img">📦</div>' +
+    '<div class="market-detail-price"><small style="font-size:16px">¥</small>' + priceStr + '</div>' +
+    '<div class="market-detail-title">' + escapeHtml(it.title || '') + '</div>' +
+    '<div class="market-detail-desc">' + escapeHtml(it.description || '暂无描述') + '</div>' +
+    '<div class="market-detail-seller">' +
+    '<img class="wall-avatar sm" src="' + avatarDataUrl(it.nickname) + '" alt="" />' +
+    '<div><div class="wall-nick">' + escapeHtml(it.nickname || '') + '</div>' +
+    '<div class="wall-time">UID ' + escapeHtml(it.uid || '') + ' · ' + formatTime(it.created_at) + '</div></div></div>' +
+    (isOwner && it.status === 'available'
+      ? '<button type="button" class="btn-secondary" style="margin-top:1rem;width:100%" id="market-sold-btn" data-id="' + it.id + '">标记为已售出</button>'
+      : '') +
+    (it.status === 'sold' ? '<p class="hint" style="margin-top:1rem;color:#ff5000">该商品已售出</p>' : '');
+  const soldBtn = $('#market-sold-btn');
+  if (soldBtn) {
+    soldBtn.addEventListener('click', async () => {
+      const res = await API.soldMarketItem(soldBtn.dataset.id);
+      if (!res.ok) { alert(res.error || '操作失败'); return; }
+      openMarketDetail(id);
+    });
+  }
+}
+function openMarketModal() {
+  if ($('#market-title')) $('#market-title').value = '';
+  if ($('#market-price')) $('#market-price').value = '';
+  if ($('#market-desc')) $('#market-desc').value = '';
+  if ($('#market-error')) $('#market-error').textContent = '';
+  const m = $('#market-modal');
+  if (m) m.classList.remove('hidden');
+}
+function closeMarketModal() {
+  const m = $('#market-modal');
+  if (m) m.classList.add('hidden');
+}
+async function submitMarket() {
+  const title = ($('#market-title') && $('#market-title').value.trim()) || '';
+  const price = $('#market-price') && $('#market-price').value;
+  const description = ($('#market-desc') && $('#market-desc').value.trim()) || '';
+  const err = $('#market-error');
+  if (err) err.textContent = '';
+  if (title.length < 2) { if (err) err.textContent = '标题至少2个字'; return; }
+  if (price === '' || price === null) { if (err) err.textContent = '请填写价格'; return; }
+  const res = await API.createMarketItem(title, price, description);
+  if (!res.ok) { if (err) err.textContent = res.error || '发布失败'; return; }
+  closeMarketModal();
+  switchContentPage('market');
+  loadMarket();
 }
 function loadUserInfo() {
   const user = Storage.getUser();
