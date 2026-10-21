@@ -98,5 +98,31 @@ const API = {
       await request('/api/posts/' + postId + '/comments', { method: 'POST', body: { content } });
       return { ok: true };
     } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async listMarket(q = '') {
+    try {
+      const params = new URLSearchParams();
+      if (q) params.set('q', q);
+      const data = await request('/api/market?' + params.toString());
+      return data.items || [];
+    } catch (e) { return []; }
+  },
+  async getMarketItem(id) {
+    try { return await request('/api/market/' + id); } catch (e) { return null; }
+  },
+  async createMarketItem(title, price, description) {
+    try {
+      const data = await request('/api/market', {
+        method: 'POST',
+        body: { title, price, description }
+      });
+      return { ok: true, id: data.id };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async soldMarketItem(id) {
+    try {
+      await request('/api/market/' + id + '/sold', { method: 'POST' });
+      return { ok: true };
+    } catch (e) { return { ok: false, error: e.message }; }
   }
 };
