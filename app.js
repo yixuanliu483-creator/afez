@@ -1,6 +1,4 @@
-/**
- * 安福二中论坛 - 告白墙频道式贴吧
- */
+/** 安福二中论坛 - 贴吧+匿名墙+热门点赞 */
 const $ = (sel) => document.querySelector(sel);
 const $$ = (sel) => document.querySelectorAll(sel);
 const welcomePage = $('#welcome-page');
@@ -19,6 +17,7 @@ const composeModal = $('#compose-modal');
 let currentBoardId = '';
 let currentPostId = null;
 let currentTab = 'all';
+let composeMode = 'normal';
 
 function init() {
   if (Storage.isLoggedIn()) { forceMainPage(); loadUserInfo(); loadWallFeed(); }
@@ -36,7 +35,7 @@ function forceMainPage() {
   if (authModal) authModal.classList.add('hidden');
   closeSidebar(); closeUserDropdown();
 }
-function openAuthModal() { authModal.classList.remove('hidden'); switchTab('login'); }
+function openAuthModal() { authModal.classList.remove('hidden'); switchAuthTab('login'); }
 function closeAuthModal() { authModal.classList.add('hidden'); }
 
 function bindEvents() {
@@ -46,7 +45,7 @@ function bindEvents() {
   });
   const overlay = authModal && authModal.querySelector('.modal-overlay');
   if (overlay) overlay.addEventListener('click', closeAuthModal);
-  $$('.modal-tabs .tab').forEach((tab) => tab.addEventListener('click', () => switchTab(tab.dataset.tab)));
+  $$('.modal-tabs .tab').forEach((tab) => tab.addEventListener('click', () => switchAuthTab(tab.dataset.tab)));
   if (loginForm) loginForm.addEventListener('submit', async (e) => {
     e.preventDefault();
     const qq = $('#login-qq').value.trim();
@@ -109,6 +108,7 @@ function bindEvents() {
       item.classList.add('active');
       closeSidebar();
       if (page === 'tieba') loadWallFeed();
+      if (page === 'anonymous') loadAnonFeed();
     });
   });
   if (userAvatar) userAvatar.addEventListener('click', (e) => { e.stopPropagation(); if (userDropdown) userDropdown.classList.toggle('hidden'); });
@@ -134,31 +134,30 @@ function bindEvents() {
     });
   });
   const backWall = $('#back-to-wall');
-  if (backWall) backWall.addEventListener('click', () => { switchContentPage('tieba'); loadWallFeed(); });
-  const openCompose = () => {
-    const c = $('#compose-content'); const e = $('#compose-error'); const b = $('#compose-board');
-    if (c) c.value = ''; if (e) e.textContent = '';
-    if (b && currentBoardId) b.value = currentBoardId;
-    if (composeModal) composeModal.classList.remove('hidden');
-  };
-  const wallOpen = $('#wall-compose-open');
-  const wallPlus = $('#wall-plus');
-  if (wallOpen) wallOpen.addEventListener('click', openCompose);
-  if (wallPlus) wallPlus.addEventListener('click', openCompose);
-  const assistant = $('#wall-assistant');
-  if (assistant) assistant.addEventListener('click', () => alert('频道助手：可在此查看规则、联系管理。'));
-  const composeCancel = $('#compose-cancel');
-  if (composeCancel) composeCancel.addEventListener('click', closeCompose);
+  if (backWall) backWall.addEventListener('click', () => {
+    const last = document.querySelector('.sidebar-item.active');
+    const page = (last && last.dataset.page) || 'tieba';
+    switchContentPage(page === 'anonymous' ? 'anonymous' : 'tieba');
+    if (page === 'anonymous') loadAnonFeed(); else loadWallFeed();
+  });
+  const openComposeNormal = () => openCompose('normal');
+  const openComposeAnon = () => openCompose('anonymous');
+  if ($('#wall-compose-open')) $('#wall-compose-open').addEventListener('click', openComposeNormal);
+  if ($('#wall-plus')) $('#wall-plus').addEventListener('click', openComposeNormal);
+  if ($('#anon-compose-open')) $('#anon-compose-open').addEventListener('click', openComposeAnon);
+  if ($('#anon-plus')) $('#anon-plus').addEventListener('click', openComposeAnon);
+  const assistantMsg = () => alert('论坛助手：文明发言；寻物招领请写清地点特征；匿名墙禁止人身攻击。');
+  if ($('#wall-assistant')) $('#wall-assistant').addEventListener('click', assistantMsg);
+  if ($('#anon-assistant')) $('#anon-assistant').addEventListener('click', assistantMsg);
+  if ($('#compose-cancel')) $('#compose-cancel').addEventListener('click', closeCompose);
   if (composeModal) {
     const co = composeModal.querySelector('.modal-overlay');
     if (co) co.addEventListener('click', closeCompose);
   }
-  const composeSubmit = $('#compose-submit');
-  if (composeSubmit) composeSubmit.addEventListener('click', submitPost);
-  const replyBtn = $('#reply-btn');
-  if (replyBtn) replyBtn.addEventListener('click', submitReply);
+  if ($('#compose-submit')) $('#compose-submit').addEventListener('click', submitPost);
+  if ($('#reply-btn')) $('#reply-btn').addEventListener('click', submitReply);
 }
-function switchTab(tab) {
+function switchAuthTab(tab) {
   $$('.modal-tabs .tab').forEach((t) => t.classList.toggle('active', t.dataset.tab === tab));
   if (loginForm) loginForm.classList.toggle('hidden', tab !== 'login');
   if (registerForm) registerForm.classList.toggle('hidden', tab !== 'register');
@@ -174,53 +173,76 @@ function switchContentPage(page) {
   if (target) target.classList.add('active');
   $$('.sidebar-item').forEach((i) => i.classList.toggle('active', i.dataset.page === page));
   if (page === 'profile') renderProfile();
-  const bar = document.querySelector('.wall-bottom-bar');
-  if (bar) bar.style.display = page === 'tieba' ? 'flex' : 'none';
+  const wallBar = document.querySelector('#page-tieba .wall-bottom-bar');
+  const anonBar = $('#anon-bottom-bar');
+  if (wallBar) wallBar.style.display = page === 'tieba' ? 'flex' : 'none';
+  if (anonBar) anonBar.style.display = page === 'anonymous' ? 'flex' : 'none';
 }
 function avatarDataUrl(name) {
-  const first = (name || 'U')[0].toUpperCase();
-  return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="#12B7F5"/><text x="50" y="62" text-anchor="middle" fill="white" font-size="42" font-family="sans-serif" font-weight="600">' + first + '</text></svg>');
+  const first = (name || '匿')[0].toUpperCase();
+  const color = name === '匿名用户' ? '#94a3b8' : '#12B7F5';
+  return 'data:image/svg+xml,' + encodeURIComponent('<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="' + color + '"/><text x="50" y="62" text-anchor="middle" fill="white" font-size="42" font-family="sans-serif" font-weight="600">' + first + '</text></svg>');
 }
-function uidToLv(uid) {
-  if (!uid) return 1;
-  const n = parseInt(String(uid).replace(/\D/g, ''), 10) || 1;
-  return Math.min(99, Math.max(1, (n % 20) + 1));
+function displayName(p) {
+  if (p.is_anonymous || p.board_id === 'anonymous') return '匿名用户';
+  return p.nickname || '用户';
+}
+function renderFeedCards(posts, container) {
+  if (!container) return;
+  if (!posts.length) { container.innerHTML = '<div class="empty-list">还没有内容，点下方发第一条吧</div>'; return; }
+  container.innerHTML = posts.map((p) => {
+    const time = formatTime(p.created_at || p.updated_at);
+    const body = p.content || p.title || '';
+    const name = displayName(p);
+    const likes = p.like_count || 0;
+    const anonTag = (p.is_anonymous || p.board_id === 'anonymous') ? '<span class="wall-anon-tag">匿名</span>' : '';
+    return '<article class="wall-card" data-id="' + p.id + '">' +
+      '<div class="wall-card-hd"><img class="wall-avatar" src="' + avatarDataUrl(name) + '" alt="" />' +
+      '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">' + escapeHtml(name) + '</span>' + anonTag +
+      '</div><div class="wall-time">' + time + '</div></div></div>' +
+      '<div class="wall-body">' + escapeHtml(body) + '</div>' +
+      '<div class="wall-ft"><span class="wall-views">浏览' + (p.view_count || 0) + '</span>' +
+      '<div class="wall-acts"><span class="act-like" data-id="' + p.id + '">👍 ' + likes + '</span>' +
+      '<span>💬 ' + (p.reply_count || 0) + '</span><span>↗</span></div></div></article>';
+  }).join('');
+  container.querySelectorAll('.wall-card').forEach((card) => {
+    card.addEventListener('click', (e) => {
+      if (e.target.closest('.wall-acts')) return;
+      openPost(card.dataset.id);
+    });
+  });
+  container.querySelectorAll('.act-like').forEach((btn) => {
+    btn.addEventListener('click', async (e) => {
+      e.stopPropagation();
+      const res = await API.likePost(btn.dataset.id);
+      if (res.ok) btn.textContent = '👍 ' + (res.like_count != null ? res.like_count : '');
+      else alert(res.error || '点赞失败');
+    });
+  });
 }
 async function loadWallFeed() {
   const feed = $('#wall-feed');
   if (!feed) return;
   feed.innerHTML = '<div class="empty-list">加载中...</div>';
   let posts = [];
-  try { posts = await API.listPosts(currentBoardId || ''); } catch (e) { posts = []; }
-  if (currentTab === 'hot' && posts.length) {
-    posts = posts.slice().sort((a, b) => (b.reply_count || 0) + (b.view_count || 0) - ((a.reply_count || 0) + (a.view_count || 0)));
+  try {
+    if (currentTab === 'hot') posts = await API.listPosts('', { hot: true });
+    else if (currentBoardId) posts = await API.listPosts(currentBoardId);
+    else posts = await API.listPosts('');
+  } catch (e) { posts = []; }
+  if (currentTab === 'hot') {
+    posts = posts.filter((p) => (p.like_count || 0) >= 5);
+    if (!posts.length) { feed.innerHTML = '<div class="empty-list">暂无热门帖（需满 5 个赞）</div>'; return; }
   }
-  if (currentTab === 'essence' && posts.length) {
-    posts = posts.filter((p) => p.is_pinned);
-    if (!posts.length) { feed.innerHTML = '<div class="empty-list">暂无精华帖</div>'; return; }
-  }
-  if (!posts.length) {
-    feed.innerHTML = '<div class="empty-list">还没有分享，点下方「期待你的分享」发第一条吧</div>';
-    return;
-  }
-  feed.innerHTML = posts.map((p) => {
-    const time = formatTime(p.created_at || p.updated_at);
-    const body = p.content || p.title || '';
-    const lv = uidToLv(p.uid);
-    return '<article class="wall-card" data-id="' + p.id + '">' +
-      '<div class="wall-card-hd"><img class="wall-avatar" src="' + avatarDataUrl(p.nickname) + '" alt="" />' +
-      '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">' + escapeHtml(p.nickname || '用户') +
-      '</span><span class="wall-lv">LV' + lv + '</span></div><div class="wall-time">' + time + '</div></div></div>' +
-      '<div class="wall-body">' + escapeHtml(body) + '</div>' +
-      '<div class="wall-ft"><span class="wall-views">浏览' + (p.view_count || 0) + '</span>' +
-      '<div class="wall-acts"><span>😊</span><span>💬</span><span>↗</span></div></div></article>';
-  }).join('');
-  feed.querySelectorAll('.wall-card').forEach((card) => {
-    card.addEventListener('click', (e) => {
-      if (e.target.closest('.wall-acts')) return;
-      openPost(card.dataset.id);
-    });
-  });
+  renderFeedCards(posts, feed);
+}
+async function loadAnonFeed() {
+  const feed = $('#anon-feed');
+  if (!feed) return;
+  feed.innerHTML = '<div class="empty-list">加载中...</div>';
+  let posts = [];
+  try { posts = await API.listPosts('anonymous'); } catch (e) { posts = []; }
+  renderFeedCards(posts, feed);
 }
 async function openPost(postId) {
   currentPostId = postId;
@@ -233,11 +255,13 @@ async function openPost(postId) {
   const p = data.post;
   const comments = data.comments || [];
   const body = p.content || p.title || '';
-  let html = '<div class="wall-card-hd"><img class="wall-avatar" src="' + avatarDataUrl(p.nickname) + '" alt="" />' +
-    '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">' + escapeHtml(p.nickname || '') +
-    '</span><span class="wall-lv">LV' + uidToLv(p.uid) + '</span></div><div class="wall-time">' + formatTime(p.created_at) +
-    '</div></div></div><div class="wall-body" style="margin-left:0">' + escapeHtml(body) + '</div>' +
-    '<div class="wall-views" style="margin:8px 0 16px">浏览' + (p.view_count || 0) + ' · 评论' + (p.reply_count || 0) +
+  const name = displayName(p);
+  let html = '<div class="wall-card-hd"><img class="wall-avatar" src="' + avatarDataUrl(name) + '" alt="" />' +
+    '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">' + escapeHtml(name) + '</span>' +
+    ((p.is_anonymous || p.board_id === 'anonymous') ? '<span class="wall-anon-tag">匿名</span>' : '') +
+    '</div><div class="wall-time">' + formatTime(p.created_at) + '</div></div></div>' +
+    '<div class="wall-body" style="margin-left:0">' + escapeHtml(body) + '</div>' +
+    '<div class="wall-views" style="margin:8px 0 16px">浏览' + (p.view_count || 0) + ' · 赞' + (p.like_count || 0) + ' · 评论' + (p.reply_count || 0) +
     '</div><div class="channel-comments-title">全部评论</div>';
   if (comments.length) {
     html += comments.map((c) =>
@@ -250,24 +274,45 @@ async function openPost(postId) {
   box.innerHTML = html;
   const rc = $('#reply-content'); if (rc) rc.value = '';
 }
-function closeCompose() { if (composeModal) composeModal.classList.add('hidden'); }
+function openCompose(mode) {
+  composeMode = mode || 'normal';
+  const c = $('#compose-content'); const e = $('#compose-error'); const b = $('#compose-board');
+  const row = $('#compose-anon-row');
+  const title = composeModal && composeModal.querySelector('h3');
+  if (c) c.value = ''; if (e) e.textContent = '';
+  if (composeMode === 'anonymous') {
+    if (b) { b.value = 'anonymous'; b.disabled = true; }
+    if (row) row.style.display = 'block';
+    if (title) title.textContent = '匿名发布';
+  } else {
+    if (b) {
+      b.disabled = false;
+      if (currentBoardId && currentBoardId !== 'anonymous') b.value = currentBoardId;
+      else b.value = 'daily';
+    }
+    if (row) row.style.display = 'none';
+    if (title) title.textContent = '发布分享';
+  }
+  if (composeModal) composeModal.classList.remove('hidden');
+}
+function closeCompose() {
+  if (composeModal) composeModal.classList.add('hidden');
+  const b = $('#compose-board'); if (b) b.disabled = false;
+}
 async function submitPost() {
   const content = ($('#compose-content') && $('#compose-content').value.trim()) || '';
-  const board = ($('#compose-board') && $('#compose-board').value) || 'daily';
+  let board = ($('#compose-board') && $('#compose-board').value) || 'daily';
   const err = $('#compose-error');
   if (err) err.textContent = '';
   if (!content) { if (err) err.textContent = '请填写内容'; return; }
+  const isAnon = composeMode === 'anonymous';
+  if (isAnon) board = 'anonymous';
   const title = content.length > 20 ? content.slice(0, 20) + '…' : content;
-  const res = await API.createPost(board || 'daily', title, content);
-  if (!res.ok) {
-    if (String(res.error || '').includes('板块')) {
-      const boards = await API.listBoards();
-      const bid = (boards[0] && boards[0].id) || 'daily';
-      const res2 = await API.createPost(bid, title, content);
-      if (!res2.ok) { if (err) err.textContent = res2.error || '发帖失败'; return; }
-    } else { if (err) err.textContent = res.error || '发帖失败'; return; }
-  }
-  closeCompose(); switchContentPage('tieba'); loadWallFeed();
+  const res = await API.createPost(board, title, content, isAnon);
+  if (!res.ok) { if (err) err.textContent = res.error || '发帖失败'; return; }
+  closeCompose();
+  if (isAnon) { switchContentPage('anonymous'); loadAnonFeed(); }
+  else { switchContentPage('tieba'); loadWallFeed(); }
 }
 async function submitReply() {
   if (!currentPostId) return;
