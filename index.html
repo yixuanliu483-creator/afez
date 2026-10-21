@@ -79,6 +79,7 @@
         <div class="sidebar-divider"></div>
         <a href="#" class="sidebar-item" data-page="profile"><span class="icon">👤</span> 个人信息</a>
         <a href="#" class="sidebar-item" data-page="settings"><span class="icon">⚙️</span> 设置</a>
+        <a href="#" class="sidebar-item" data-page="admin" id="sidebar-admin" style="display:none"><span class="icon">🛡️</span> 管理面板</a>
       </nav>
     </aside>
     <div id="sidebar-overlay" class="sidebar-overlay"></div>
@@ -209,6 +210,11 @@
           <div class="setting-item"><span>修改密码</span><button class="btn-secondary small">修改</button></div>
           <div class="setting-item"><span>退出登录</span><button class="btn-danger small" data-action="logout">退出</button></div>
         </div>
+      </section>
+      <section id="page-admin" class="content-page">
+        <div class="page-header"><h2>管理面板</h2></div>
+        <p class="hint" style="margin-bottom:1rem">站长 / 管理员可删除违规帖子</p>
+        <div id="admin-post-list" class="admin-list"><div class="empty-tip">加载中...</div></div>
       </section>
     </main>
   </div>
