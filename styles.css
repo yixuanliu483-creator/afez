@@ -100,8 +100,6 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .channel-comment { display: flex; gap: 10px; padding: 12px 0; border-bottom: 1px solid #f5f5f5; }
 .channel-comment-main { flex: 1; min-width: 0; }
 .channel-comment-text { font-size: 14px; color: #333; line-height: 1.5; margin-top: 4px; white-space: pre-wrap; }
-
-/* 告白墙结构 */
 .wall-page { background: #f5f6f8; margin: -1rem; padding: 0 0 72px; min-height: calc(100vh - var(--nav-h)); }
 .wall-tabs { display: flex; overflow-x: auto; background: #fff; padding: 0 8px; border-bottom: 1px solid #f0f0f0; -webkit-overflow-scrolling: touch; scrollbar-width: none; }
 .wall-tabs::-webkit-scrollbar { display: none; }
@@ -118,12 +116,13 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .wall-meta { flex: 1; min-width: 0; }
 .wall-name-row { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
 .wall-nick { font-size: 14px; font-weight: 600; color: #1a1a1a; }
-.wall-lv { font-size: 11px; color: #fff; background: linear-gradient(90deg, #7ee8a0, #3dd68c); padding: 1px 6px; border-radius: 4px; font-weight: 600; }
+.wall-anon-tag { font-size: 11px; color: #64748b; background: #f1f5f9; padding: 1px 6px; border-radius: 4px; font-weight: 500; }
 .wall-time { font-size: 12px; color: #999; margin-top: 2px; }
 .wall-body { font-size: 15px; color: #1a1a1a; line-height: 1.55; white-space: pre-wrap; word-break: break-word; margin: 4px 0 10px 50px; }
 .wall-ft { display: flex; align-items: center; justify-content: space-between; margin-left: 50px; padding-top: 4px; }
 .wall-views { font-size: 12px; color: #999; }
-.wall-acts { display: flex; gap: 16px; color: #999; font-size: 16px; }
+.wall-acts { display: flex; gap: 16px; color: #999; font-size: 14px; }
+.act-like { cursor: pointer; user-select: none; }
 .wall-bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: flex; align-items: center; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #f0f0f0; box-shadow: 0 -2px 10px rgba(0,0,0,0.04); }
 .wall-assistant { flex-shrink: 0; border: none; background: #e8f7ff; color: #12B7F5; font-size: 12px; padding: 8px 10px; border-radius: 16px; cursor: pointer; white-space: nowrap; font-family: inherit; }
 .wall-compose-input { flex: 1; background: #f5f6f8; border-radius: 20px; padding: 10px 14px; cursor: pointer; }
