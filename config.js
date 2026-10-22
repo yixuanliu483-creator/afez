@@ -1,7 +1,7 @@
 // 配置文件
 const CONFIG = {
-  // 后端 API 地址
-  API_BASE: 'https://afezapi.yixuanliu483.workers.dev',
+  // 后端 API 地址（自定义域）
+  API_BASE: 'https://afez.de5.net',
 
   // 关闭本地 mock，使用真实后端
   USE_MOCK: false,
