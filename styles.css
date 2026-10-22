@@ -123,6 +123,7 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .wall-views { font-size: 12px; color: #999; }
 .wall-acts { display: flex; gap: 16px; color: #999; font-size: 14px; }
 .act-like { cursor: pointer; user-select: none; }
+.act-like.liked { color: #ff5000; font-weight: 600; }
 .wall-bottom-bar { position: fixed; left: 0; right: 0; bottom: 0; z-index: 80; display: flex; align-items: center; gap: 8px; padding: 8px 12px calc(8px + env(safe-area-inset-bottom)); background: #fff; border-top: 1px solid #f0f0f0; box-shadow: 0 -2px 10px rgba(0,0,0,0.04); }
 .wall-assistant { flex-shrink: 0; border: none; background: #e8f7ff; color: #12B7F5; font-size: 12px; padding: 8px 10px; border-radius: 16px; cursor: pointer; white-space: nowrap; font-family: inherit; }
 .wall-compose-input { flex: 1; background: #f5f6f8; border-radius: 20px; padding: 10px 14px; cursor: pointer; }
@@ -147,3 +148,67 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 .market-detail-title { font-size: 18px; font-weight: 600; line-height: 1.4; }
 .market-detail-desc { margin-top: 1rem; font-size: 14px; color: #555; line-height: 1.6; white-space: pre-wrap; }
 .market-detail-seller { margin-top: 1.2rem; padding-top: 1rem; border-top: 1px solid #f0f0f0; display: flex; align-items: center; gap: 10px; font-size: 14px; }
+.admin-list { display: flex; flex-direction: column; gap: 10px; }
+.admin-card { background: #fff; border-radius: 12px; padding: 12px 14px; box-shadow: 0 1px 3px rgba(0,0,0,0.05); border: 1px solid #f0f0f0; }
+.admin-card-hd { display: flex; justify-content: space-between; align-items: flex-start; gap: 8px; }
+.admin-card-meta { font-size: 12px; color: #999; margin-top: 4px; }
+.admin-card-body { font-size: 14px; color: #333; margin: 8px 0; line-height: 1.45; max-height: 4.5em; overflow: hidden; white-space: pre-wrap; word-break: break-word; }
+.btn-danger.admin-del { padding: 0.35rem 0.85rem; font-size: 0.8rem; border-radius: 8px; white-space: nowrap; }
+
+/* 匿名墙 · 深色模式 */
+.wall-page-dark {
+  background: #0f1115;
+}
+.wall-page-dark .wall-pin {
+  background: #1a1d24;
+  color: #a1a8b3;
+}
+.wall-page-dark .wall-pin strong {
+  color: #e8eaed;
+}
+.wall-page-dark .wall-card {
+  background: #1a1d24;
+  box-shadow: 0 1px 4px rgba(0,0,0,0.35);
+  border: 1px solid #252830;
+}
+.wall-page-dark .wall-nick {
+  color: #e8eaed;
+}
+.wall-page-dark .wall-time,
+.wall-page-dark .wall-views,
+.wall-page-dark .wall-acts {
+  color: #8b929e;
+}
+.wall-page-dark .wall-body {
+  color: #d1d5db;
+}
+.wall-page-dark .wall-anon-tag {
+  background: #2a2f3a;
+  color: #a78bfa;
+}
+.wall-page-dark .empty-list,
+.wall-page-dark .empty-tip {
+  color: #8b929e;
+}
+.wall-page-dark .wall-bottom-bar {
+  background: #15181e;
+  border-top-color: #252830;
+  box-shadow: 0 -2px 12px rgba(0,0,0,0.4);
+}
+.wall-page-dark .wall-assistant {
+  background: #252830;
+  color: #a78bfa;
+}
+.wall-page-dark .wall-compose-input {
+  background: #252830;
+}
+.wall-page-dark .wall-placeholder {
+  color: #6b7280;
+}
+.wall-page-dark .wall-plus {
+  background: #2a2f3a;
+  color: #e8eaed;
+}
+.wall-page-dark .act-like.liked {
+  color: #f472b6;
+}
