@@ -1,10 +1,19 @@
-(function(){
-  Promise.all([0,1,2].map(function(i){ return fetch('app_b'+i+'.txt?v=20261023').then(function(r){return r.text();}); }))
-  .then(function(parts){
-    var b64 = parts.join('');
-    var bin = atob(b64);
-    var s = document.createElement('script');
-    s.textContent = bin;
-    document.body.appendChild(s);
-  }).catch(function(e){ console.error(e); alert('脚本加载失败，请强制刷新'); });
+/* 从已知良好版本加载，并补丁匿名墙深色 */
+(function () {
+  var s = document.createElement('script');
+  s.src = 'https://cdn.jsdelivr.net/gh/yixuanliu483-creator/afez@2356e7a0ff97ab69c7322244887956e763b1ce29/app.js';
+  s.onload = function () {
+    var orig = window.switchContentPage;
+    if (typeof orig !== 'function') return;
+    window.switchContentPage = function (page) {
+      orig(page);
+      document.body.classList.toggle('theme-anon-dark', page === 'anonymous');
+      var main = document.getElementById('main-page');
+      if (main) main.classList.toggle('theme-anon-dark', page === 'anonymous');
+    };
+  };
+  s.onerror = function () {
+    alert('脚本加载失败，请检查网络后强制刷新');
+  };
+  document.head.appendChild(s);
 })();
