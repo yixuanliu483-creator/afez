@@ -157,7 +157,8 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 
 /* 匿名墙 · 深色模式 */
 .wall-page-dark {
-  background: #0f1115;
+  background: #0f1115 !important;
+  min-height: calc(100vh - var(--nav-h));
 }
 .wall-page-dark .wall-pin {
   background: #1a1d24;
@@ -211,4 +212,21 @@ html, body { height: 100%; font-family: 'Noto Sans SC', -apple-system, BlinkMacS
 }
 .wall-page-dark .act-like.liked {
   color: #f472b6;
+}
+
+/* 进入匿名墙时整页深色（含顶栏） */
+body.theme-anon-dark,
+#main-page.theme-anon-dark {
+  background: #0f1115 !important;
+}
+body.theme-anon-dark .navbar,
+#main-page.theme-anon-dark .navbar {
+  background: rgba(15, 17, 21, 0.96);
+  border-bottom-color: #252830;
+}
+body.theme-anon-dark .navbar .icon-btn span {
+  background: #e8eaed;
+}
+body.theme-anon-dark .content {
+  background: transparent;
 }
