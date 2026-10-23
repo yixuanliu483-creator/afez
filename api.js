@@ -93,9 +93,27 @@ const API = {
       return { ok: true, like_count: data.like_count, liked: data.liked };
     } catch (e) { return { ok: false, error: e.message }; }
   },
-  async createComment(postId, content) {
+  async createComment(postId, content, parentId = null) {
     try {
-      await request('/api/posts/' + postId + '/comments', { method: 'POST', body: { content } });
+      const body = { content };
+      if (parentId) body.parent_id = parentId;
+      await request('/api/posts/' + postId + '/comments', { method: 'POST', body });
+      return { ok: true };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async votePost(id, vote) {
+    try {
+      const data = await request('/api/posts/' + id + '/vote', { method: 'POST', body: { vote } });
+      return { ok: true, ...data };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
+  async getVotes(id) {
+    try { return await request('/api/posts/' + id + '/vote'); }
+    catch (e) { return { violation: 0, normal: 0, total: 0 }; }
+  },
+  async withdrawPost(id) {
+    try {
+      await request('/api/posts/' + id + '/withdraw', { method: 'POST' });
       return { ok: true };
     } catch (e) { return { ok: false, error: e.message }; }
   },
