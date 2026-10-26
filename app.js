@@ -6,14 +6,14 @@ let lastFeedPage = 'tieba', __bound = false, replyToCommentId = null;
 
 function forceWelcomePage() {
   const w = $('#welcome-page'), m = $('#main-page'), a = $('#auth-modal');
-  if (w) { w.classList.add('active'); w.style.display = 'flex'; }
-  if (m) { m.classList.remove('active'); m.style.display = 'none'; }
+  if (w) { w.classList.add('active'); w.style.removeProperty('display'); }
+  if (m) { m.classList.remove('active'); m.style.removeProperty('display'); }
   if (a) a.classList.add('hidden');
 }
 function forceMainPage() {
   const w = $('#welcome-page'), m = $('#main-page'), a = $('#auth-modal');
-  if (w) { w.classList.remove('active'); w.style.display = 'none'; }
-  if (m) { m.classList.add('active'); m.style.display = 'block'; }
+  if (w) { w.classList.remove('active'); w.style.removeProperty('display'); }
+  if (m) { m.classList.add('active'); m.style.removeProperty('display'); }
   if (a) a.classList.add('hidden');
   closeSidebar(); closeUserDropdown();
 }
