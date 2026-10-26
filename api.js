@@ -101,6 +101,12 @@ const API = {
       return { ok: true };
     } catch (e) { return { ok: false, error: e.message }; }
   },
+  async reportPost(id) {
+    try {
+      const data = await request('/api/posts/' + id + '/report', { method: 'POST', body: {} });
+      return { ok: true, ...data };
+    } catch (e) { return { ok: false, error: e.message }; }
+  },
   async votePost(id, vote) {
     try {
       const data = await request('/api/posts/' + id + '/vote', { method: 'POST', body: { vote } });
