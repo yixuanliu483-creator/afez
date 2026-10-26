@@ -1,0 +1,83 @@
+/* 匿名墙深色 */
+body.theme-anon-dark,
+.wall-page-dark {
+  background: #12141a !important;
+  color: #e8eaed;
+}
+body.theme-anon-dark .navbar,
+body.theme-anon-dark .wall-bottom-bar,
+.wall-page-dark .wall-bottom-bar {
+  background: rgba(22, 24, 32, 0.96) !important;
+  border-color: #2a2d38 !important;
+}
+body.theme-anon-dark .nav-title { color: #f0f1f5; }
+body.theme-anon-dark .wall-pin,
+.wall-page-dark .wall-pin {
+  background: #1c1f2a;
+  color: #c4c7d0;
+  border: 1px solid #2a2d38;
+}
+body.theme-anon-dark .wall-card,
+.wall-page-dark .wall-card {
+  background: #1a1d27;
+  border-color: #2a2d38;
+  color: #e8eaed;
+}
+body.theme-anon-dark .wall-nick,
+.wall-page-dark .wall-nick { color: #f0f1f5; }
+body.theme-anon-dark .wall-body,
+.wall-page-dark .wall-body { color: #d0d3db; }
+body.theme-anon-dark .wall-time,
+body.theme-anon-dark .wall-views,
+.wall-page-dark .wall-time,
+.wall-page-dark .wall-views { color: #8b90a0; }
+body.theme-anon-dark .wall-compose-input,
+.wall-page-dark .wall-compose-input {
+  background: #252836;
+  color: #9aa0b0;
+}
+body.theme-anon-dark .wall-assistant,
+.wall-page-dark .wall-assistant {
+  background: #252836;
+  color: #c4c7d0;
+}
+body.theme-anon-dark .more-menu {
+  background: #1a1d27;
+  border-color: #2a2d38;
+}
+body.theme-anon-dark .more-item { color: #e8eaed; }
+body.theme-anon-dark .more-item:hover { background: #252836; }
+body.theme-anon-dark .empty-list { color: #8b90a0; }
+.report-badge {
+  margin-top: 8px;
+  font-size: 12px;
+  color: #dc2626;
+  background: #fef2f2;
+  padding: 4px 8px;
+  border-radius: 6px;
+  display: inline-block;
+}
+body.theme-anon-dark .report-badge {
+  background: #3a1a1a;
+  color: #fca5a5;
+}
+.vote-panel {
+  margin: 8px 0;
+  padding: 8px 10px;
+  background: #fff7ed;
+  border-radius: 10px;
+  border: 1px solid #fed7aa;
+}
+.vote-counts { font-size: 13px; color: #9a3412; margin-bottom: 6px; }
+.vote-counts b { color: #c2410c; }
+.act-comment { cursor: pointer; }
+.admin-tag {
+  display: inline-block;
+  font-size: 11px;
+  padding: 1px 6px;
+  border-radius: 4px;
+  margin-right: 4px;
+}
+.admin-tag.report-tag { background: #fef2f2; color: #dc2626; }
+.admin-tag.hidden-tag { background: #f3f4f6; color: #6b7280; }
+.admin-item-text { font-size: 13px; color: #374151; margin-top: 2px; }
