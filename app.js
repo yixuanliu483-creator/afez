@@ -1,4 +1,4 @@
-/** 安福二中论坛 - 独立前端（无 CDN） */
+/** 安福二中论坛 - 独立前端 */
 const $ = (s) => document.querySelector(s);
 const $$ = (s) => document.querySelectorAll(s);
 let currentBoardId = '', currentPostId = null, currentTab = 'all', composeMode = 'normal';
@@ -48,7 +48,7 @@ function formatTime(t) {
     if (diff < 3600) return Math.floor(diff / 60) + '分钟前';
     if (diff < 86400) return Math.floor(diff / 3600) + '小时前';
     return String(d.getHours()).padStart(2,'0') + ':' + String(d.getMinutes()).padStart(2,'0');
-  } catch { return String(t).slice(0, 16); }
+  } catch (e) { return String(t).slice(0, 16); }
 }
 function displayName(p) {
   if (p && (p.is_anonymous || p.board_id === 'anonymous')) return '匿名用户';
@@ -66,7 +66,7 @@ async function refreshRole() {
   try {
     const p = await API.getProfile();
     if (p && p.role) { const u = Storage.getUser() || {}; u.role = p.role; Storage.setUser(u); updateAdminMenu(); }
-  } catch (_) {}
+  } catch (e) {}
 }
 function switchContentPage(page) {
   $$('.content-page').forEach((el) => el.classList.remove('active'));
@@ -78,35 +78,36 @@ function switchContentPage(page) {
   document.body.classList.toggle('theme-anon-dark', page === 'anonymous');
   closeSidebar();
 }
+function cardHtml(p, me) {
+  const body = p.content || p.title || '';
+  const need = body.length > 120;
+  const short = need ? body.slice(0, 120) + '…' : body;
+  const name = displayName(p);
+  const anonTag = (p.is_anonymous || p.board_id === 'anonymous') ? '<span class="wall-anon-tag">匿名</span>' : '';
+  const isMine = me && (p.uid === me.uid);
+  const staff = me && (me.role === 'admin' || me.role === 'owner');
+  let menu = '<div class="more-item" data-act="report" data-id="'+p.id+'">举报并表决</div>';
+  if (isMine) menu += '<div class="more-item" data-act="withdraw" data-id="'+p.id+'">撤回帖子</div>';
+  if (staff || isMine) menu += '<div class="more-item danger" data-act="delete" data-id="'+p.id+'">删除帖子</div>';
+  return [
+    '<article class="wall-card" data-id="'+p.id+'">',
+    '<div class="wall-card-hd"><img class="wall-avatar" src="'+avatarDataUrl(name)+'" alt=""/>',
+    '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">'+escapeHtml(name)+'</span>'+anonTag+'</div>',
+    '<div class="wall-time">'+formatTime(p.created_at||p.updated_at)+'</div></div>',
+    '<div class="wall-card-actions"><button type="button" class="more-btn" data-id="'+p.id+'">⋯</button>',
+    '<div class="more-menu hidden" data-menu="'+p.id+'">'+menu+'</div></div></div>',
+    '<div class="wall-body"><span class="wall-body-text">'+escapeHtml(short)+'</span>',
+    (need ? '<button type="button" class="expand-btn">展开</button>' : ''),
+    '</div><div class="wall-ft"><span class="wall-views">浏览'+(p.view_count||0)+'</span>',
+    '<div class="wall-acts"><span class="act-like" data-id="'+p.id+'">🤍 '+(p.like_count||0)+'</span>',
+    '<span>💬 '+(p.reply_count||0)+'</span></div></div></article>'
+  ].join('');
+}
 function renderFeedCards(posts, container) {
   if (!container) return;
   if (!posts || !posts.length) { container.innerHTML = '<div class="empty-list">还没有内容，点下方发第一条吧</div>'; return; }
   const me = Storage.getUser();
-  container.innerHTML = posts.map((p) => {
-    const body = p.content || p.title || '';
-    const need = body.length > 120;
-    const short = need ? body.slice(0, 120) + '…' : body;
-    const name = displayName(p);
-    const anonTag = (p.is_anonymous || p.board_id === 'anonymous') ? '<span class="wall-anon-tag">匿名</span>' : '';
-    const isMine = me && (p.uid === me.uid);
-    const staff = me && (me.role === 'admin' || me.role === 'owner');
-    return '<article class="wall-card" data-id="'+p.id+'">'+'
-      <div class="wall-card-hd"><img class="wall-avatar" src="'+avatarDataUrl(name)+'" alt=""/>'+
-      '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">'+escapeHtml(name)+'</span>'+anonTag+
-      '</div><div class="wall-time">'+formatTime(p.created_at||p.updated_at)+'</div></div>'+
-      '<div class="wall-card-actions">'+
-      '<button type="button" class="more-btn" data-id="'+p.id+'">⋯</button>'+
-      '<div class="more-menu hidden" data-menu="'+p.id+'">'+
-      '<div class="more-item" data-act="report" data-id="'+p.id+'">举报并表决</div>'+
-      (isMine ? '<div class="more-item" data-act="withdraw" data-id="'+p.id+'">撤回帖子</div>' : '')+
-      ((staff || isMine) ? '<div class="more-item danger" data-act="delete" data-id="'+p.id+'">删除帖子</div>' : '')+
-      '</div></div></div>'+
-      '<div class="wall-body"><span class="wall-body-text">'+escapeHtml(short)+'</span>'+
-      (need ? '<button type="button" class="expand-btn">展开</button>' : '')+'</div>'+
-      '<div class="wall-ft"><span class="wall-views">浏览'+(p.view_count||0)+'</span>'+
-      '<div class="wall-acts"><span class="act-like" data-id="'+p.id+'">🤍 '+(p.like_count||0)+'</span>'+
-      '<span>💬 '+(p.reply_count||0)+'</span></div></div></article>';
-  }).join('');
+  container.innerHTML = posts.map((p) => cardHtml(p, me)).join('');
   container.querySelectorAll('.wall-card').forEach((card) => {
     card.addEventListener('click', (e) => {
       if (e.target.closest('.wall-acts,.expand-btn,.more-btn,.more-menu,.vote-btns')) return;
@@ -207,12 +208,13 @@ async function openPost(postId) {
   function childrenOf(pid) { return comments.filter((c) => c.parent_id == pid); }
   function renderC(c, depth) {
     const kids = childrenOf(c.id);
-    let h = '<div class="channel-comment'+(depth>0?' reply-nested':'')+'" data-cid="'+c.id+'">'+'
-      <img class="wall-avatar sm" src="'+avatarDataUrl(c.nickname)+'" alt=""/>'+
-      '<div class="channel-comment-main"><div class="wall-nick">'+escapeHtml(c.nickname||'')+
-      ' <span class="wall-time">'+formatTime(c.created_at)+'</span></div>'+
-      '<div class="channel-comment-text">'+escapeHtml(c.content)+'</div>'+
-      '<div class="comment-acts"><button type="button" class="reply-to-btn" data-cid="'+c.id+'" data-name="'+escapeHtml(c.nickname||'')+'">回复</button>';
+    let h = [
+      '<div class="channel-comment'+(depth>0?' reply-nested':'')+'" data-cid="'+c.id+'">',
+      '<img class="wall-avatar sm" src="'+avatarDataUrl(c.nickname)+'" alt=""/>',
+      '<div class="channel-comment-main"><div class="wall-nick">'+escapeHtml(c.nickname||'')+' <span class="wall-time">'+formatTime(c.created_at)+'</span></div>',
+      '<div class="channel-comment-text">'+escapeHtml(c.content)+'</div>',
+      '<div class="comment-acts"><button type="button" class="reply-to-btn" data-cid="'+c.id+'" data-name="'+escapeHtml(c.nickname||'')+'">回复</button>'
+    ].join('');
     if (kids.length && depth === 0) h += '<button type="button" class="expand-floor-btn" data-cid="'+c.id+'">展开本楼('+kids.length+')</button>';
     h += '</div>';
     if (kids.length) {
@@ -223,15 +225,17 @@ async function openPost(postId) {
     h += '</div></div>';
     return h;
   }
-  let html = '<div class="detail-top"><div class="wall-card-hd"><img class="wall-avatar" src="'+avatarDataUrl(name)+'" alt=""/>'+
-    '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">'+escapeHtml(name)+'</span>'+
-    ((p.is_anonymous||p.board_id==='anonymous')?'<span class="wall-anon-tag">匿名</span>':'')+
-    '</div><div class="wall-time">'+formatTime(p.created_at)+'</div></div>'+
-    '<div class="vote-btns detail-vote"><button type="button" class="vote-btn vote-bad" data-vote="violation">违规</button>'+
-    '<button type="button" class="vote-btn vote-ok" data-vote="normal">正常</button></div></div></div>'+
-    '<div class="wall-body detail-body" style="margin-left:0">'+escapeHtml(body)+'</div>'+
-    '<div class="wall-views" style="margin:8px 0 16px">浏览'+(p.view_count||0)+' · 赞'+(p.like_count||0)+' · 评论'+(p.reply_count||0)+'</div>'+
-    '<div class="channel-comments-title">全部评论</div>';
+  let html = [
+    '<div class="detail-top"><div class="wall-card-hd"><img class="wall-avatar" src="'+avatarDataUrl(name)+'" alt=""/>',
+    '<div class="wall-meta"><div class="wall-name-row"><span class="wall-nick">'+escapeHtml(name)+'</span>',
+    ((p.is_anonymous||p.board_id==='anonymous')?'<span class="wall-anon-tag">匿名</span>':''),
+    '</div><div class="wall-time">'+formatTime(p.created_at)+'</div></div>',
+    '<div class="vote-btns detail-vote"><button type="button" class="vote-btn vote-bad" data-vote="violation">违规</button>',
+    '<button type="button" class="vote-btn vote-ok" data-vote="normal">正常</button></div></div></div>',
+    '<div class="wall-body detail-body" style="margin-left:0">'+escapeHtml(body)+'</div>',
+    '<div class="wall-views" style="margin:8px 0 16px">浏览'+(p.view_count||0)+' · 赞'+(p.like_count||0)+' · 评论'+(p.reply_count||0)+'</div>',
+    '<div class="channel-comments-title">全部评论</div>'
+  ].join('');
   if (roots.length) html += roots.map((c) => renderC(c, 0)).join('');
   else html += '<div class="empty-list" style="padding:1rem 0">暂无评论，来抢沙发</div>';
   box.innerHTML = html;
