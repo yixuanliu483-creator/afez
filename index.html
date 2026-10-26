@@ -5,9 +5,14 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
   <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate" />
   <title>安福二中论坛</title>
-  <link rel="stylesheet" href="styles.css?v=20261026" />
+  <link rel="stylesheet" href="styles.css?v=20261026b" />
   <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@400;500;700&display=swap" rel="stylesheet" />
-  <style>#welcome-page.page{display:flex!important;min-height:100vh;}</style>
+  <style>
+    #welcome-page.page.active { display: flex; min-height: 100vh; }
+    #welcome-page.page:not(.active) { display: none !important; }
+    #main-page.page.active { display: block !important; }
+    #main-page.page:not(.active) { display: none !important; }
+  </style>
 </head>
 <body>
   <div id="welcome-page" class="page active">
@@ -16,15 +21,15 @@
       <div class="school-logo"><div class="logo-placeholder"><span class="logo-text">安福二中</span><span class="logo-sub">ANFU NO.2 MIDDLE SCHOOL</span></div></div>
       <h1 class="forum-title">安福二中论坛</h1>
       <p class="forum-subtitle">校园大型交流社区</p>
-      <button id="enter-btn" class="btn-primary">立即进入</button>
+      <button type="button" id="enter-btn" class="btn-primary">立即进入</button>
     </div>
   </div>
   <div id="auth-modal" class="modal hidden">
     <div class="modal-overlay"></div>
     <div class="modal-box">
       <div class="modal-tabs">
-        <button class="tab active" data-tab="login">登录</button>
-        <button class="tab" data-tab="register">注册</button>
+        <button type="button" class="tab active" data-tab="login">登录</button>
+        <button type="button" class="tab" data-tab="register">注册</button>
       </div>
       <form id="login-form" class="auth-form">
         <div class="form-group"><label>QQ邮箱</label>
@@ -57,7 +62,7 @@
   </div>
   <div id="main-page" class="page">
     <header class="navbar">
-      <button id="hamburger-btn" class="icon-btn" aria-label="菜单"><span></span><span></span><span></span></button>
+      <button type="button" id="hamburger-btn" class="icon-btn" aria-label="菜单"><span></span><span></span><span></span></button>
       <div class="nav-center"><h1 class="nav-title" id="nav-title">安福二中论坛</h1></div>
       <div class="nav-right">
         <div class="search-box"><input type="search" id="global-search" placeholder="搜索..." /></div>
@@ -72,7 +77,7 @@
       </div>
     </header>
     <aside id="sidebar" class="sidebar">
-      <div class="sidebar-header"><span>菜单</span><button id="sidebar-close" class="icon-btn close">×</button></div>
+      <div class="sidebar-header"><span>菜单</span><button type="button" id="sidebar-close" class="icon-btn close">×</button></div>
       <nav class="sidebar-nav">
         <a href="#" class="sidebar-item active" data-page="tieba"><span class="icon">📌</span> 二中贴吧</a>
         <a href="#" class="sidebar-item" data-page="anonymous"><span class="icon">🎭</span> 匿名墙</a>
@@ -88,12 +93,12 @@
     <main id="content" class="content">
       <section id="page-tieba" class="content-page active wall-page">
         <div class="wall-tabs" id="wall-tabs">
-          <button class="wall-tab active" data-tab="all">全部</button>
-          <button class="wall-tab" data-tab="hot">热门</button>
-          <button class="wall-tab" data-board="biaobai">表白</button>
-          <button class="wall-tab" data-board="xunwu">寻物招领</button>
-          <button class="wall-tab" data-board="help">求助</button>
-          <button class="wall-tab" data-board="daily">日常</button>
+          <button type="button" class="wall-tab active" data-tab="all">全部</button>
+          <button type="button" class="wall-tab" data-tab="hot">热门</button>
+          <button type="button" class="wall-tab" data-board="biaobai">表白</button>
+          <button type="button" class="wall-tab" data-board="xunwu">寻物招领</button>
+          <button type="button" class="wall-tab" data-board="help">求助</button>
+          <button type="button" class="wall-tab" data-board="daily">日常</button>
         </div>
         <div class="wall-pin" id="wall-pin">
           <strong>置顶 |</strong> 善意投稿、交友、表白、求助、寻物招领请文明发言。匿名帖会出现在「全部」。
@@ -122,13 +127,13 @@
       </section>
       <section id="page-post-detail" class="content-page">
         <div class="page-header">
-          <button class="btn-back" id="back-to-wall">← 返回</button>
+          <button type="button" class="btn-back" id="back-to-wall">← 返回</button>
           <h2>详情</h2>
         </div>
         <div id="post-detail" class="post-detail wall-detail"></div>
         <div class="reply-box">
           <textarea id="reply-content" placeholder="写下你的回复..." rows="3"></textarea>
-          <button class="btn-primary" id="reply-btn">发表回复</button>
+          <button type="button" class="btn-primary" id="reply-btn">发表回复</button>
         </div>
       </section>
       <div id="compose-modal" class="modal hidden">
@@ -164,7 +169,7 @@
           <div class="chat-messages" id="chat-messages"><div class="msg system">欢迎来到安福二中聊天室，请文明发言。</div></div>
           <div class="chat-input-area">
             <input type="text" id="chat-input" placeholder="输入消息..." />
-            <button id="chat-send" class="btn-primary">发送</button>
+            <button type="button" id="chat-send" class="btn-primary">发送</button>
           </div>
         </div>
       </section>
@@ -195,7 +200,7 @@
       </div>
       <section id="page-market-detail" class="content-page">
         <div class="page-header">
-          <button class="btn-back" id="back-to-market">← 返回市场</button>
+          <button type="button" class="btn-back" id="back-to-market">← 返回市场</button>
           <h2>商品详情</h2>
         </div>
         <div id="market-detail" class="market-detail-box"></div>
@@ -208,8 +213,8 @@
         <div class="page-header"><h2>设置</h2></div>
         <div class="settings-list">
           <div class="setting-item"><span>修改昵称</span><input type="text" id="setting-nickname" /></div>
-          <div class="setting-item"><span>修改密码</span><button class="btn-secondary small">修改</button></div>
-          <div class="setting-item"><span>退出登录</span><button class="btn-danger small" data-action="logout">退出</button></div>
+          <div class="setting-item"><span>修改密码</span><button type="button" class="btn-secondary small">修改</button></div>
+          <div class="setting-item"><span>退出登录</span><button type="button" class="btn-danger small" data-action="logout">退出</button></div>
         </div>
       </section>
       <section id="page-admin" class="content-page">
@@ -219,8 +224,8 @@
       </section>
     </main>
   </div>
-  <script src="config.js?v=20261026"></script>
-  <script src="api.js?v=20261026"></script>
-  <script src="app.js?v=20261026"></script>
+  <script src="config.js?v=20261026b"></script>
+  <script src="api.js?v=20261026b"></script>
+  <script src="app.js?v=20261026b"></script>
 </body>
 </html>
